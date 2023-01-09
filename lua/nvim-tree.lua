@@ -229,7 +229,7 @@ local function setup_autocommands(opts)
         and vim.bo[data.buf].buftype == ""
       then
         utils.debounce("Buf:filter_buffer", opts.view.debounce_delay, function()
-          reloaders.reload_explorer(nil, data.buf)
+          reloaders.reload_explorer()
         end)
       end
     end,

@@ -48,7 +48,7 @@ local picture_map = {
   gif = true,
 }
 
-function M.draw(unloaded_bufnr)
+function M.draw()
   local bufnr = view.get_bufnr()
   if not core.get_explorer() or not bufnr or not vim.api.nvim_buf_is_loaded(bufnr) then
     return
@@ -72,7 +72,7 @@ function M.draw(unloaded_bufnr)
     :configure_symlink_destination(M.config.symlink_destination)
     :configure_filter(live_filter.filter, live_filter.prefix)
     :build_header(view.is_root_folder_visible(core.get_cwd()))
-    :build(core.get_explorer(), unloaded_bufnr)
+    :build(core.get_explorer())
     :unwrap()
 
   _draw(bufnr, lines, hl, signs)

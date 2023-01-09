@@ -41,26 +41,6 @@ local function git(path, git_status)
   return false
 end
 
----Check if the given path has no listed buffer
----@param path string Absolute path
----@param bufinfo table vim.fn.getbufinfo { buflisted = 1 }
----@param unloaded_bufnr number optional bufnr recently unloaded via BufUnload event
----@return boolean
-local function buf(path, bufinfo, unloaded_bufnr)
-  if not M.config.filter_no_buffer or type(bufinfo) ~= "table" then
-    return false
-  end
-
-  -- filter files with no open buffer and directories containing no open buffers
-  for _, b in ipairs(bufinfo) do
-    if b.name == path or b.name:find(path .. "/", 1, true) and b.bufnr ~= unloaded_bufnr then
-      return false
-    end
-  end
-
-  return true
-end
-
 local function dotfile(path)
   return M.config.filter_dotfiles and utils.path_basename(path):sub(1, 1) == "."
 end
@@ -92,15 +72,12 @@ end
 
 ---Prepare arguments for should_filter. This is done prior to should_filter for efficiency reasons.
 ---@param git_status table|nil optional results of git.load_project_status(...)
----@param unloaded_bufnr number|nil optional bufnr recently unloaded via BufUnload event
 ---@return table
 --- git_status: reference
---- unloaded_bufnr: copy
 --- bufinfo: empty unless no_buffer set: vim.fn.getbufinfo { buflisted = 1 }
-function M.prepare(git_status, unloaded_bufnr)
+function M.prepare(git_status)
   local status = {
     git_status = git_status or {},
-    unloaded_bufnr = unloaded_bufnr,
     bufinfo = {},
   }
 
@@ -121,10 +98,7 @@ function M.should_filter(path, status)
     return false
   end
 
-  return git(path, status.git_status)
-    or buf(path, status.bufinfo, status.unloaded_bufnr)
-    or dotfile(path)
-    or custom(path)
+  return git(path, status.git_status) or dotfile(path) or custom(path)
 end
 
 function M.setup(opts)

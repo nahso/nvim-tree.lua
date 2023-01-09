@@ -228,7 +228,7 @@ end
 
 ---@param node table
 ---@return string icon_highlight, string name_highlight
-function Builder:_get_highlight_override(node, unloaded_bufnr)
+function Builder:_get_highlight_override(node)
   -- highlights precedence:
   -- original < git < opened_file < modified
   local name_hl, icon_hl
@@ -237,20 +237,6 @@ function Builder:_get_highlight_override(node, unloaded_bufnr)
   local git_highlight = git.get_highlight(node)
   if git_highlight then
     name_hl = git_highlight
-  end
-
-  -- opened file
-  if
-    self.highlight_opened_files
-    and vim.fn.bufloaded(node.absolute_path) > 0
-    and vim.fn.bufnr(node.absolute_path) ~= unloaded_bufnr
-  then
-    if self.highlight_opened_files == "all" or self.highlight_opened_files == "name" then
-      name_hl = "NvimTreeOpenedFile"
-    end
-    if self.highlight_opened_files == "all" or self.highlight_opened_files == "icon" then
-      icon_hl = "NvimTreeOpenedFile"
-    end
   end
 
   -- modified file
@@ -310,7 +296,7 @@ function Builder:_format_line(padding, icon, name, git_icons, modified_icon)
   return line
 end
 
-function Builder:_build_line(node, idx, num_children, unloaded_bufnr)
+function Builder:_build_line(node, idx, num_children)
   -- various components
   local padding = pad.get_padding(self.depth, idx, num_children, node, self.markers)
   local git_icons = self:_get_git_icons(node)
@@ -329,7 +315,7 @@ function Builder:_build_line(node, idx, num_children, unloaded_bufnr)
   end
 
   -- highlight override
-  local icon_hl, name_hl = self:_get_highlight_override(node, unloaded_bufnr)
+  local icon_hl, name_hl = self:_get_highlight_override(node)
   if icon_hl then
     icon.hl = icon_hl
   end
@@ -346,7 +332,7 @@ function Builder:_build_line(node, idx, num_children, unloaded_bufnr)
 
   if node.open then
     self.depth = self.depth + 1
-    self:build(node, unloaded_bufnr)
+    self:build(node)
     self.depth = self.depth - 1
   end
 end
@@ -365,12 +351,12 @@ function Builder:_get_nodes_number(nodes)
   return i
 end
 
-function Builder:build(tree, unloaded_bufnr)
+function Builder:build(tree)
   local num_children = self:_get_nodes_number(tree.nodes)
   local idx = 1
   for _, node in ipairs(tree.nodes) do
     if not node.hidden then
-      self:_build_line(node, idx, num_children, unloaded_bufnr)
+      self:_build_line(node, idx, num_children)
       idx = idx + 1
     end
   end
