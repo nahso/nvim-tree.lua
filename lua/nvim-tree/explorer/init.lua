@@ -89,7 +89,7 @@ function M.setup(opts)
   require("nvim-tree.explorer.reload").setup(opts)
   require("nvim-tree.explorer.watch").setup(opts)
 
-  Clipboard = require "nvim-tree.actions.fs.copy-paste"
+  Clipboard = require "nvim-tree.actions.fs.clipboard"
 end
 
 M.Explorer = Explorer
