@@ -52,7 +52,6 @@ function Explorer.new(path)
   explorer.watcher = watch.create_watcher(explorer)
   explorer.filters = Filters:new(M.config, explorer)
   explorer.live_filter = LiveFilter:new(M.config, explorer)
-  -- explorer.clipboard = require "nvim-tree.actions.fs.copy-paste":new(M.config, explorer)
   explorer.clipboard = Clipboard:new(M.config, explorer)
   explorer:_load(explorer)
   return explorer
@@ -90,7 +89,7 @@ function M.setup(opts)
   require("nvim-tree.explorer.reload").setup(opts)
   require("nvim-tree.explorer.watch").setup(opts)
 
-  Clipboard = copy_paste or require "nvim-tree.actions.fs.copy-paste"
+  Clipboard = require "nvim-tree.actions.fs.copy-paste"
 end
 
 M.Explorer = Explorer
